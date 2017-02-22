@@ -2,7 +2,6 @@ import os
 from BeautifulSoup import BeautifulSoup
 import urllib2
 import urllib
-
 import re
 
 NUMBER_PAGES = 6 #Introduce the number of pages that your profile has
@@ -13,13 +12,13 @@ links_formatted = [] #List of tuples following this pattern (NAME OF THE PIC, pa
 for page in range(1, NUMBER_PAGES+1):  #Get all image links from the different pages and append them in the links_formatted list
     list_href = []
     url = 'http://www.todocoleccion.net/s/catalogo-antiguedades-arte-coleccionismo-subastas?P=' + str(page) + '&idvendedor=' +USERNAME
+    list_names = []
 
     html_page = urllib2.urlopen(url)
     soup = BeautifulSoup(html_page)
     for link in soup.findAll('a'):
         list_href.append(link.string)
 
-    list_names = []
     for name in list_href:
         try:
             if sum(1 for c in name if c.isupper()) > 6:
@@ -31,9 +30,9 @@ for page in range(1, NUMBER_PAGES+1):  #Get all image links from the different p
     html = website.read()
 
     links = re.findall('"((http|ftp)s?://.*jpg)"', html)
-
     for idx,item in enumerate(links):
-        links_formatted.append((item[0],list_names[idx]))
+        links_formatted.append((item[0],list_names[idx])) #format
+
 
 try:
     os.mkdir("downloads")
@@ -42,6 +41,14 @@ except:
 
 #Proceed to download all files
 for idx,download_file in enumerate(links_formatted):
+    repeated_file = 1
     print("Downloading file " + str(idx+1) + " of " + str(len(links_formatted)) + " ------- " + download_file[1])
     removed_slash = download_file[1].replace("/", "")
-    urllib.urlretrieve(download_file[0], 'downloads/' +removed_slash+'.jpg')
+    file_name = 'downloads/' +removed_slash+'.jpg'
+
+    if os.path.isfile(file_name): # Check if the file is already in the folder and add a (1)
+        file_name = 'downloads/' +removed_slash + '_('+ str(repeated_file) + ')' + '.jpg'
+        repeated_file +=1
+
+    urllib.urlretrieve(download_file[0],file_name )
+
