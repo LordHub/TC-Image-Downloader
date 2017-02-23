@@ -1,7 +1,6 @@
 import os
 from BeautifulSoup import BeautifulSoup
 import urllib2
-import urllib
 import re
 
 NUMBER_PAGES = 6 #Introduce the number of pages that your profile has
@@ -52,5 +51,8 @@ for idx,download_file in enumerate(links_formatted):
         file_name = IMAGES_DIRECTORY + '/'  +removed_slash + '_('+ str(repeated_file) + ')' + '.jpg'
         repeated_file +=1
 
-    urllib.urlretrieve(download_file[0],file_name )
+    f = urllib2.urlopen(download_file[0])
+    data = f.read()
+    with open(file_name, "wb") as code:
+        code.write(data)
 
