@@ -1,18 +1,19 @@
 import os
 from BeautifulSoup import BeautifulSoup
 import urllib2
-import urllib
 import re
 
 NUMBER_PAGES = 6 #Introduce the number of pages that your profile has
 USERNAME = 'huescacity' #Username in todocoleccion.net
+IMAGES_DIRECTORY = "downloadedImages" #Directory name
 
 links_formatted = [] #List of tuples following this pattern (NAME OF THE PIC, path to be saved)
 
 for page in range(1, NUMBER_PAGES+1):  #Get all image links from the different pages and append them in the links_formatted list
     list_href = []
-    url = 'http://www.todocoleccion.net/s/catalogo-antiguedades-arte-coleccionismo-subastas?P=' + str(page) + '&idvendedor=' +USERNAME
     list_names = []
+    url = 'http://www.todocoleccion.net/s/catalogo-antiguedades-arte-coleccionismo-subastas?P=' + str(page) + '&idvendedor=' +USERNAME
+
 
     html_page = urllib2.urlopen(url)
     soup = BeautifulSoup(html_page)
@@ -35,7 +36,7 @@ for page in range(1, NUMBER_PAGES+1):  #Get all image links from the different p
 
 
 try:
-    os.mkdir("downloads")
+    os.mkdir(IMAGES_DIRECTORY) #Create directory /downloadImages
 except:
     pass
 
@@ -44,11 +45,14 @@ for idx,download_file in enumerate(links_formatted):
     repeated_file = 1
     print("Downloading file " + str(idx+1) + " of " + str(len(links_formatted)) + " ------- " + download_file[1])
     removed_slash = download_file[1].replace("/", "")
-    file_name = 'downloads/' +removed_slash+'.jpg'
+    file_name = IMAGES_DIRECTORY + '/' + removed_slash +'.jpg'
 
     if os.path.isfile(file_name): # Check if the file is already in the folder and add a (1)
-        file_name = 'downloads/' +removed_slash + '_('+ str(repeated_file) + ')' + '.jpg'
+        file_name = IMAGES_DIRECTORY + '/'  +removed_slash + '_('+ str(repeated_file) + ')' + '.jpg'
         repeated_file +=1
 
-    urllib.urlretrieve(download_file[0],file_name )
+    f = urllib2.urlopen(download_file[0])
+    data = f.read()
+    with open(file_name, "wb") as code:
+        code.write(data)
 
