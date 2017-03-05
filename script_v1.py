@@ -1,6 +1,15 @@
+#! /usr/bin/env python
+
+try:
+    from urllib.parse import urlparse, urlencode
+    from urllib.request import urlopen, Request
+    from urllib.error import HTTPError
+except ImportError:
+    from urlparse import urlparse
+    from urllib import urlencode
+    from urllib2 import urlopen, Request, HTTPError
 import os
-from BeautifulSoup import BeautifulSoup
-import urllib2
+from bs4 import BeautifulSoup
 import re
 
 NUMBER_PAGES = 6 #Introduce the number of pages that your profile has
@@ -15,8 +24,8 @@ for page in range(1, NUMBER_PAGES+1):  #Get all image links from the different p
     url = 'http://www.todocoleccion.net/s/catalogo-antiguedades-arte-coleccionismo-subastas?P=' + str(page) + '&idvendedor=' +USERNAME
 
 
-    html_page = urllib2.urlopen(url)
-    soup = BeautifulSoup(html_page)
+    html_page = urlopen(url)
+    soup = BeautifulSoup(html_page,"html.parser")
     for link in soup.findAll('a'):
         list_href.append(link.string)
 
@@ -27,10 +36,10 @@ for page in range(1, NUMBER_PAGES+1):  #Get all image links from the different p
         except:
             pass
 
-    website = urllib2.urlopen(url)
+    website = urlopen(url)
     html = website.read()
 
-    links = re.findall('"((http|ftp)s?://.*jpg)"', html)
+    links = re.findall(b'"((http|ftp)s?://.*jpg)"', html)
     for idx,item in enumerate(links):
         links_formatted.append((item[0],list_names[idx])) #format
 
@@ -51,8 +60,12 @@ for idx,download_file in enumerate(links_formatted):
         file_name = IMAGES_DIRECTORY + '/'  +removed_slash + '_('+ str(repeated_file) + ')' + '.jpg'
         repeated_file +=1
 
-    f = urllib2.urlopen(download_file[0])
+    urlx = download_file[0].decode("utf-8")
+    f = urlopen(urlx)
+
     data = f.read()
     with open(file_name, "wb") as code:
         code.write(data)
+
+
 
