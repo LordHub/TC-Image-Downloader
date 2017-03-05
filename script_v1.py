@@ -11,6 +11,7 @@ except ImportError:
 import os
 from bs4 import BeautifulSoup
 import re
+import Crop
 
 NUMBER_PAGES = 6 #Introduce the number of pages that your profile has
 USERNAME = 'huescacity' #Username in todocoleccion.net
@@ -66,6 +67,7 @@ for idx,download_file in enumerate(links_formatted):
     data = f.read()
     with open(file_name, "wb") as code:
         code.write(data)
+    Crop.cropImage(file_name)
 
 
 
